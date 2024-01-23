@@ -3,7 +3,6 @@ import Todo from '../models/ToDo.js';
 
 const router = Router();
 
-// Helper function to handle asynchronous route handlers
 const asyncHandler = (handler) => (req, res, next) => handler(req, res, next).catch(next);
 
 router.get('/todo', asyncHandler(async (req, res) => {
@@ -12,20 +11,30 @@ router.get('/todo', asyncHandler(async (req, res) => {
 }));
 
 router.post('/todo/new', asyncHandler(async (req, res) => {
-  const newTask = await Todo.create(req.body);
+  console.log('Request Body:', req.body);
+  const { title, description, priority } = req.body;
+
+  const newTask = await Todo.create({
+    title,
+    description: description || '', // If description is not provided, default to an empty string
+    priority: priority || 'Medium', // If priority is not provided, default to 'Medium'
+  });
+
   res.status(201).json({ data: newTask });
 }));
 
 router.put('/todo/update/:id', asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const updatedTask = await Todo.findByIdAndUpdate(id, req.body, { new: true });
+  const updatedTask = await Todo.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json({ data: updatedTask });
 }));
 
 router.delete('/todo/delete/:id', asyncHandler(async (req, res) => {
-  const result = await Todo.findByIdAndDelete(req.params.id);
+  await Todo.findByIdAndDelete(req.params.id);
   res.status(204).json();
 }));
 
 export default router;
+
+
+
 

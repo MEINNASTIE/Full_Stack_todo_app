@@ -28,3 +28,4 @@ const TodoSchema = new Schema(
 );
 
 export default model('Todo', TodoSchema);
+

@@ -1,29 +1,26 @@
-import React, { useState } from 'react';
-import TaskList from './components/TaskList';
-import AddTaskForm from './components/AddTaskForm';
+import TodoList from './components/TodoList';
+import TodoForm from './components/TodoForm';
+import TaskProvider from './context/TaskContext';
 
-function App() {
-  // Local state to store the list of tasks
-  const [tasks, setTasks] = useState([]);
-
-  // Function to add a new task to the list
-  const handleAddTask = (newTask) => {
-    // Update the state to include the new task
-    setTasks((prevTasks) => [...prevTasks, newTask]);
-  };
-
+const App = () => {
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold text-center mt-4">To-Do List</h1>
-      {/* Pass the handleAddTask function to the AddTaskForm component */}
-      <AddTaskForm onAddTask={handleAddTask} />
-      {/* Pass the tasks state to the TaskList component */}
-      <TaskList tasks={tasks} />
-    </div>
+    <TaskProvider>
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">To-Do List</h1>
+        <TodoForm />
+        <TodoList />
+      </div>
+    </TaskProvider>
   );
-}
+};
 
 export default App;
+
+
+
+
+
+
 
 
 
