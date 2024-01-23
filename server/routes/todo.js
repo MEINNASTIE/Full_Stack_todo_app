@@ -1,61 +1,31 @@
 import { Router } from 'express';
-const router = Router();
 import Todo from '../models/ToDo.js';
 
-// Route to get all to-do items
-router.get('/todos', async (req, res) => {
-  try {
-    const todos = await find();
-    res.json(todos);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
+const router = Router();
 
-// Route to add a new to-do item
-router.post('/todos', async (req, res) => {
-  const { description } = req.body;
+// Helper function to handle asynchronous route handlers
+const asyncHandler = (handler) => (req, res, next) => handler(req, res, next).catch(next);
 
-  try {
-    const newTodo = new Todo({ description });
-    await newTodo.save();
-    res.json(newTodo);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
+router.get('/todo', asyncHandler(async (req, res) => {
+  const allTasks = await Todo.find();
+  res.json({ data: allTasks });
+}));
 
-// Route to update a to-do item
-router.put('/todos/:id', async (req, res) => {
+router.post('/todo/new', asyncHandler(async (req, res) => {
+  const newTask = await Todo.create(req.body);
+  res.status(201).json({ data: newTask });
+}));
+
+router.put('/todo/update/:id', asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { description, completed } = req.body;
+  const updatedTask = await Todo.findByIdAndUpdate(id, req.body, { new: true });
+  res.json({ data: updatedTask });
+}));
 
-  try {
-    const updatedTodo = await findByIdAndUpdate(
-      id,
-      { description, completed },
-      { new: true }
-    );
-    res.json(updatedTodo);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
-
-// Route to delete a to-do item
-router.delete('/todos/:id', async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    await findByIdAndDelete(id);
-    res.json({ message: 'To-Do item deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
+router.delete('/todo/delete/:id', asyncHandler(async (req, res) => {
+  const result = await Todo.findByIdAndDelete(req.params.id);
+  res.status(204).json();
+}));
 
 export default router;
+
