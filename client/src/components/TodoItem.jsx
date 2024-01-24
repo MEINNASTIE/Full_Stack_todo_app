@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const TodoItem = ({ task, onDelete, onPriorityChange, onUpdateTask }) => {
+const TodoItem = ({ task, onDelete, onUpdateTask }) => {
   const { _id, title, description, priority, completed } = task;
 
   const [isEditing, setIsEditing] = useState(false);

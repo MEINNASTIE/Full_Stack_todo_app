@@ -16,8 +16,8 @@ router.post('/todo/new', asyncHandler(async (req, res) => {
 
   const newTask = await Todo.create({
     title,
-    description: description || '', // If description is not provided, default to an empty string
-    priority: priority || 'Medium', // If priority is not provided, default to 'Medium'
+    description: description || '', 
+    priority: priority || 'Medium', 
   });
 
   res.status(201).json({ data: newTask });
