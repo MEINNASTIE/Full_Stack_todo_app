@@ -12,14 +12,15 @@ router.get('/todo', asyncHandler(async (req, res) => {
 
 router.post('/todo/new', asyncHandler(async (req, res) => {
   console.log('Request Body:', req.body);
-  const { title, description, priority } = req.body;
+  const { title, description, priority, dueDate } = req.body;
 
   const newTask = await Todo.create({
     title,
     description: description || '', 
     priority: priority || 'Medium', 
+    dueDate: dueDate || null,
   });
-
+  console.log("New Task: ", newTask)
   res.status(201).json({ data: newTask });
 }));
 

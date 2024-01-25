@@ -7,6 +7,7 @@ export const useTaskContext = () => useContext(TaskContext);
 
 const TaskProvider = ({ children }) => {
   const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -14,7 +15,7 @@ const TaskProvider = ({ children }) => {
         const response = await axios.get('http://localhost:5000/api/todo');
         setTasks(response.data.data);
       } catch (error) {
-        console.error('Failed to fetch tasks from the server:', error.message);
+        console.error('Failed to fetch tasks from the server:', error);
       }
     };
 
@@ -23,11 +24,30 @@ const TaskProvider = ({ children }) => {
 
   const handleRequestError = (response, errorMessage) => {
     console.error(errorMessage, response.status, response.statusText);
+    console.error('Response:', response.data);
   };
 
-  const addTask = async (newTaskData) => {
+  const filterTasks = (searchQuery) => {
+    if (!searchQuery) {
+      setFilteredTasks([]);
+      return;
+    }
+
+    const filtered = tasks.filter((task) =>
+      task.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredTasks(filtered);
+  };
+
+  // to add a new task
+  const addTask = async (text, priority, description, dueDate) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/todo/new', newTaskData);
+      const response = await axios.post('http://localhost:5000/api/todo/new', {
+        title: text,
+        description: description,
+        priority: priority,
+        dueDate: dueDate,
+      });
 
       if (response.status === 201) {
         const newTask = response.data.data;
@@ -37,10 +57,11 @@ const TaskProvider = ({ children }) => {
         handleRequestError(response, 'Failed to add a new task to the server:');
       }
     } catch (error) {
-      console.error('Error adding a new task:', error.message);
+      console.error('Error adding a new task:', error);
     }
   };
 
+  //  to delete a task
   const deleteTask = async (taskId) => {
     try {
       const response = await axios.delete(`http://localhost:5000/api/todo/delete/${taskId}`);
@@ -52,10 +73,11 @@ const TaskProvider = ({ children }) => {
         handleRequestError(response, 'Failed to delete the task from the server:');
       }
     } catch (error) {
-      console.error('Error deleting task:', error.message);
+      console.error('Error deleting task:', error);
     }
   };
 
+  // to update a task
   const updateTask = async (taskId, updatedData) => {
     try {
       const response = await axios.put(`http://localhost:5000/api/todo/update/${taskId}`, updatedData);
@@ -70,16 +92,16 @@ const TaskProvider = ({ children }) => {
         handleRequestError(response, 'Failed to update the task on the server:');
       }
     } catch (error) {
-      console.error('Error updating task:', error.message);
+      console.error('Error updating task:', error);
     }
   };
 
   const contextValue = {
-    tasks,
+    tasks: filteredTasks.length > 0 ? filteredTasks : tasks,
     addTask,
     deleteTask,
     updateTask,
-    // Add other functions here
+    filterTasks,
   };
 
   return <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>;
